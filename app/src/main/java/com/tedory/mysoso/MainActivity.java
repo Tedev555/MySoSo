@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -46,7 +47,13 @@ public class MainActivity extends AppCompatActivity {
                 userStr = userNameEdt.getText().toString();
                 passStr = passwordEdt.getText().toString();
 
-
+                if (userStr.isEmpty() && passStr.isEmpty()) {
+                    Toast.makeText(getApplicationContext()
+                            , "Please enter username and password",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    login(userStr, passStr);
+                }
             }
         });
     }
@@ -58,29 +65,26 @@ public class MainActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             //Login Successful
+                            Log.i("LoginTag", "Login Successful");
+
+                            //Intent
+                            goToFeed();
+
                         } else {
                             //Login Not Successful
+                            Log.i("LoginTag", "Login Failed");
                         }
                     }
-                });
+                }).addOnCanceledListener(this, new OnCanceledListener() {
+            @Override
+            public void onCanceled() {
+                Log.e("LoginTag", "Can't not login");
+            }
+        });
     }
 
-
-
-
-
-
-//    private void login(String email, String password) {
-//        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-//            @Override
-//            public void onComplete(@NonNull Task<AuthResult> task) {
-//                if (task.isSuccessful()) {
-//                    Log.d("LoginTag", "signInWithEmail:success");
-//                } else {
-//                    Log.w("LoginTag", "signInWithEmail:failure", task.getException());
-//                }
-//            }
-//        });
-//    }
-
+    private void goToFeed() {
+        Intent intent = new Intent(this, FeedActivity.class);
+        startActivity(intent);
+    }
 }
